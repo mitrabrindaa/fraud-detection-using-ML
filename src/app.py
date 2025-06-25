@@ -1,5 +1,6 @@
 import os
-os.environ['KMP_DUPLICATE_LIB_OK']='True'  # Prevents libiomp5md.dll conflicts
+os.environ['KMP_DUPLICATE_LIB_OK']='True'  # Prevents OpenMP conflicts
+os.environ['OMP_NUM_THREADS']='1'  # Prevents XGBoost threading issues
 import sys
 import subprocess
 import streamlit as st

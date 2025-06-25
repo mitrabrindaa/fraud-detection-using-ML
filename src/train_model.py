@@ -1,5 +1,6 @@
 import os
-os.environ['KMP_DUPLICATE_LIB_OK']='True'  # Prevents libiomp5md.dll conflicts
+os.environ['KMP_DUPLICATE_LIB_OK']='True'  # Prevents OpenMP conflicts
+os.environ['OMP_NUM_THREADS']='1'  # Prevents XGBoost threading issues
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
@@ -90,7 +91,8 @@ def train_model():
             eval_metric='auc',
             random_state=42,
             early_stopping_rounds=10,
-            n_jobs=-1  # Use all available cores
+            n_jobs=-1 
+            tree_method='hist'  # More memory-efficient # Use all available cores
         )
         
         # Training with progress logging
