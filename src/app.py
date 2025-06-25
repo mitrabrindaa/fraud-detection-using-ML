@@ -1,10 +1,35 @@
+import sys
+import subprocess
 import streamlit as st
+
+# Dependency enforcement block
+REQUIRED_PACKAGES = {
+    'joblib': '1.3.2',
+    'xgboost': '2.0.3',
+    'scikit-learn': '1.3.2'
+}
+
+def install_package(package, version):
+    subprocess.check_call([
+        sys.executable, 
+        "-m", 
+        "pip", 
+        "install", 
+        f"{package}=={version}"
+    ])
+
+for package, version in REQUIRED_PACKAGES.items():
+    try:
+        __import__(package)
+    except ImportError:
+        st.warning(f"⚠️ Installing {package}...")
+        install_package(package, version)
+
+# Now safe to import
 import pandas as pd
 import joblib
 import logging
 from pathlib import Path
-import subprocess
-import sys
 
 # Force install joblib if missing (for Streamlit Cloud)
 try:
