@@ -1,3 +1,5 @@
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'  # Prevents libiomp5md.dll conflicts
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier

@@ -1,3 +1,5 @@
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'  # Prevents libiomp5md.dll conflicts
 import sys
 import subprocess
 import streamlit as st
