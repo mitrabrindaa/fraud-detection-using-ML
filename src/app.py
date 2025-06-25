@@ -4,6 +4,7 @@ import streamlit as st
 from pathlib import Path
 import logging
 import pandas as pd
+import joblib
 
 # ========== CONFIGURATION ==========
 class AppConfig:
@@ -29,6 +30,7 @@ def initialize_app():
     install_dependencies()
     setup_paths()
     configure_logging()
+    train_if_missing_model()  # New function to handle missing model
 
 def install_dependencies():
     """Ensure all required packages are installed"""
@@ -59,10 +61,7 @@ def setup_paths():
         # Create directories with parents
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         (BASE_DIR / 'logs').mkdir(exist_ok=True)
-        
-        # Validation
-        if not MODEL_PATH.exists():
-            raise FileNotFoundError(f"Model file missing at {MODEL_PATH}")
+        (BASE_DIR / 'models').mkdir(exist_ok=True)  # Ensure models directory exists
             
     except Exception as e:
         st.error(f"❌ Critical startup error: {str(e)}")
@@ -78,19 +77,51 @@ def configure_logging():
     global logger
     logger = logging.getLogger(__name__)
 
+def train_if_missing_model():
+    """Train model automatically if missing"""
+    if not MODEL_PATH.exists():
+        try:
+            from train_model import train_model
+            st.warning("⚠️ Training model for first time use...")
+            MODEL_PATH.parent.mkdir(exist_ok=True)  # Ensure models directory exists
+            train_model()  # Calls your existing training function
+            st.success("✅ Model trained successfully!")
+        except Exception as e:
+            logger.error(f"Model training failed: {str(e)}")
+            st.error(f"""
+            ❌ Could not train model automatically. Please:
+            1. Run train_model.py locally first
+            2. Commit models/fraud_model_latest.pkl to GitHub
+            3. Error details: {str(e)}
+            """)
+            st.stop()
+
 # ========== CORE FUNCTIONALITY ==========
 def load_model():
-    """Load the trained ML model"""
+    """Load the trained ML model with enhanced validation"""
     try:
+        if not MODEL_PATH.exists():
+            raise FileNotFoundError(f"No model found at {MODEL_PATH}")
+            
+        # Verify model file is not empty
+        if MODEL_PATH.stat().st_size == 0:
+            raise ValueError("Model file exists but is empty")
+            
         return joblib.load(MODEL_PATH)
     except Exception as e:
         logger.error(f"Model loading failed: {str(e)}")
-        st.error("❌ Failed to load fraud detection model")
+        st.error(f"""
+        ❌ Model loading failed. Please ensure:
+        1. File exists at: models/fraud_model_latest.pkl
+        2. File size > 0 bytes
+        3. Model was trained with matching library versions
+        Error details: {str(e)}
+        """)
         st.stop()
 
 # ========== APP INITIALIZATION ==========
 initialize_app()
-model = load_model()
+model = load_model()  # This will now either load or train the model
 
 # ========== STREAMLIT UI ==========
 st.set_page_config(
