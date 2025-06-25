@@ -1,4 +1,2 @@
 libgomp1
 python3-dev
-gcc
-build-essential
