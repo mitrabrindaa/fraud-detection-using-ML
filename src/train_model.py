@@ -81,18 +81,15 @@ def train_model():
         )
         
         # Model configuration with improved defaults
-        model = XGBClassifier(
-            scale_pos_weight=len(y_train[y_train==0])/max(1, len(y_train[y_train==1])),  # Avoid division by zero
-            n_estimators=200,
-            max_depth=6,
-            learning_rate=0.1,
-            subsample=0.8,
-            colsample_bytree=0.8,  # Added for better generalization
-            eval_metric='auc',
-            random_state=42,
-            early_stopping_rounds=10,
-            n_jobs=-1 
-            tree_method='hist'  # More memory-efficient # Use all available cores
+        # Change XGBClassifier parameters to:
+    model = XGBClassifier(
+        scale_pos_weight=len(y_train[y_train==0])/max(1, len(y_train[y_train==1])),
+        n_estimators=100,  # Reduced for faster training
+        max_depth=5,
+        learning_rate=0.05,
+        tree_method='hist',  # Essential for Streamlit Cloud
+        n_jobs=1,  # Critical for stability
+        eval_metric='aucpr'  # Better for imbalanced data
         )
         
         # Training with progress logging

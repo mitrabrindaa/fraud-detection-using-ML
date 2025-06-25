@@ -1,15 +1,16 @@
 # Python
 venv/
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
 
 # Data
-data/
-*.csv
+data/processed/
+data/uploads/
 *.pkl
 *.dll
+
+# Logs
+logs/*.log
 
 # IDE
 .vscode/

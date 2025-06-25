@@ -1,2 +1,5 @@
-libgomp1
+gfortran
 python3-dev
+libopenblas-dev
+liblapack-dev
+build-essential
