@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 import logging
 from pathlib import Path
+import pickle
 
 # Configure paths - UPDATED TO MATCH YOUR ACTUAL FILE NAME
 BASE_DIR = Path(__file__).parent.parent
@@ -40,19 +41,25 @@ def preprocess_data(input_file=RAW_DATA, output_file=PROCESSED_DATA):
         chunks = pd.read_csv(input_file, chunksize=100000)
         processed_chunks = []
         encoder = LabelEncoder()
-        
+        label_dict = {}
         for i, chunk in enumerate(chunks, 1):
             chunk = chunk.drop(['nameOrig', 'nameDest', 'isFlaggedFraud'], 
                              axis=1, errors='ignore')
             chunk['type'] = encoder.fit_transform(chunk['type'].astype(str))
+            # Save label mapping for 'type'
+            label_dict.update({str(cls): int(lbl) for cls, lbl in zip(encoder.classes_, encoder.transform(encoder.classes_))})
             chunk.fillna(0, inplace=True)
             processed_chunks.append(chunk)
             logger.info(f"Processed chunk {i}")
-        
         final_df = pd.concat(processed_chunks)
         final_df.to_csv(output_file, index=False)
         logger.info(f"Saved processed data to {output_file}")
         print(f"✅ Successfully processed data. Output at: {output_file}")
+        # Save label encoder mapping for use in app
+        models_dir = BASE_DIR / 'models'
+        models_dir.mkdir(exist_ok=True)
+        with open(models_dir / 'labels.pkl', 'wb') as f:
+            pickle.dump(label_dict, f)
         return output_file
         
     except Exception as e:

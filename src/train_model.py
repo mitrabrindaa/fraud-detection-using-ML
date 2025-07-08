@@ -9,6 +9,7 @@ import joblib
 import logging
 from pathlib import Path
 from datetime import datetime
+import pickle
 
 # Configure paths
 BASE_DIR = Path(__file__).parent.parent
@@ -81,15 +82,14 @@ def train_model():
         )
         
         # Model configuration with improved defaults
-        # Change XGBClassifier parameters to:
-    model = XGBClassifier(
-        scale_pos_weight=len(y_train[y_train==0])/max(1, len(y_train[y_train==1])),
-        n_estimators=100,  # Reduced for faster training
-        max_depth=5,
-        learning_rate=0.05,
-        tree_method='hist',  # Essential for Streamlit Cloud
-        n_jobs=1,  # Critical for stability
-        eval_metric='aucpr'  # Better for imbalanced data
+        model = XGBClassifier(
+            scale_pos_weight=len(y_train[y_train==0])/max(1, len(y_train[y_train==1])),
+            n_estimators=100,  # Reduced for faster training
+            max_depth=5,
+            learning_rate=0.05,
+            tree_method='hist',  # Essential for Streamlit Cloud
+            n_jobs=1,  # Critical for stability
+            eval_metric='aucpr'  # Better for imbalanced data
         )
         
         # Training with progress logging
@@ -115,6 +115,39 @@ def train_model():
         metrics_path = MODELS_DIR / f'model_metrics_{timestamp}.json'
         pd.DataFrame(metrics['classification_report']).to_json(metrics_path)
         
+        # Save model.pkl for app compatibility
+        with open(MODELS_DIR / 'model.pkl', 'wb') as f:
+            pickle.dump(model, f)
+        
+        # Dummy PCA/KMeans files for app (replace with real ones if available)
+        import numpy as np
+        from sklearn.decomposition import PCA
+        from sklearn.cluster import KMeans
+        
+        # C features
+        pca_c = PCA(n_components=3).fit(X_train.iloc[:, :6])
+        km_c = KMeans(n_clusters=2, random_state=42).fit(pca_c.transform(X_train.iloc[:, :6]))
+        with open(MODELS_DIR / 'PCA_C_features.pkl', 'wb') as f:
+            pickle.dump(pca_c, f)
+        with open(MODELS_DIR / 'km_C_features.pkl', 'wb') as f:
+            pickle.dump(km_c, f)
+        
+        # D features
+        pca_d = PCA(n_components=3).fit(X_train.iloc[:, :5])
+        km_d = KMeans(n_clusters=2, random_state=42).fit(pca_d.transform(X_train.iloc[:, :5]))
+        with open(MODELS_DIR / 'PCA_D_features.pkl', 'wb') as f:
+            pickle.dump(pca_d, f)
+        with open(MODELS_DIR / 'km_D_features.pkl', 'wb') as f:
+            pickle.dump(km_d, f)
+        
+        # V features
+        pca_v = PCA(n_components=3).fit(X_train.iloc[:, :11])
+        km_v = KMeans(n_clusters=2, random_state=42).fit(pca_v.transform(X_train.iloc[:, :11]))
+        with open(MODELS_DIR / 'PCA_V_features.pkl', 'wb') as f:
+            pickle.dump(pca_v, f)
+        with open(MODELS_DIR / 'km_V_features.pkl', 'wb') as f:
+            pickle.dump(km_v, f)
+        
         logger.info(f"""
         Training complete!
         - Model saved to: {model_path}
@@ -124,7 +157,7 @@ def train_model():
         """)
         
         return model_path
-        
+    
     except Exception as e:
         logger.error(f"Training pipeline failed: {str(e)}", exc_info=True)
         raise
