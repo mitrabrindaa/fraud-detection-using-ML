@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛡️ SecureGuard AI - Advanced Fraud Detection</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            margin: 2rem auto;
+            max-width: 1200px;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            margin: 0.5rem 0 0 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .form-section {
+            padding: 2rem;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            border: none;
+            border-radius: 25px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+        
+        .btn-outline-info {
+            border-color: #3498db;
+            color: #3498db;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-info:hover {
+            background-color: #3498db;
+            border-color: #3498db;
+            transform: translateY(-1px);
+        }
+        
+        .result-section {
+            padding: 2rem;
+            border-top: 1px solid #e9ecef;
+            display: none;
+        }
+        
+        .risk-gauge {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+            position: relative;
+        }
+        
+        .risk-alert {
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: 600;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .risk-high {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .risk-medium {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+        }
+        
+        .risk-low {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 1rem 0;
+        }
+        
+        .stats-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .stats-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #e74c3c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <!-- Header -->
+            <div class="header">
+                <h1><i class="fas fa-shield-alt"></i> SecureGuard AI</h1>
+                <p>Advanced AI-powered fraud detection and transaction security analysis</p>
+                <small style="opacity: 0.8;">Protecting your financial transactions with cutting-edge machine learning</small>
+            </div>
+            
+            <!-- Form Section -->
+            <div class="form-section">
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <h3><i class="fas fa-edit"></i> Transaction Details</h3>
+                        <p class="text-muted">Enter the transaction information to analyze for fraud risk</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-outline-info" onclick="loadSampleData('legitimate')">
+                            <i class="fas fa-check"></i> Load Sample Payment
+                        </button>
+                        <button class="btn btn-outline-info" onclick="loadSampleData('suspicious')">
+                            <i class="fas fa-exclamation-triangle"></i> Load Suspicious
+                        </button>
+                        <button class="btn btn-outline-info" onclick="loadSampleData('mixed')">
+                            <i class="fas fa-balance-scale"></i> Load Mixed Risk
+                        </button>
+                    </div>
+                </div>
+                
+                <form id="fraudForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Transaction Type</label>
+                                <select class="form-select" id="type" required>
+                                    <option value="PAYMENT">Payment</option>
+                                    <option value="TRANSFER">Transfer</option>
+                                    <option value="CASH_OUT">Cash Out</option>
+                                    <option value="DEBIT">Debit</option>
+                                    <option value="CASH_IN">Cash In</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Amount (₹)</label>
+                                <input type="number" class="form-control" id="amount" step="0.01" min="0" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Sender's Balance Before (₹)</label>
+                                <input type="number" class="form-control" id="oldbalanceOrg" step="0.01" min="0" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Sender's Balance After (₹)</label>
+                                <input type="number" class="form-control" id="newbalanceOrg" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Step (Time)</label>
+                                <input type="number" class="form-control" id="step" min="1" value="1" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Recipient's Balance Before (₹)</label>
+                                <input type="number" class="form-control" id="oldbalanceDest" step="0.01" min="0" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Recipient's Balance After (₹)</label>
+                                <input type="number" class="form-control" id="newbalanceDest" step="0.01" min="0" required>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Sender Name</label>
+                                        <input type="text" class="form-control" id="sender" value="John Doe" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Recipient Name</label>
+                                        <input type="text" class="form-control" id="recipient" value="Jane Smith" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search"></i> Analyze Transaction
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Loading Section -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Analyzing transaction...</p>
+            </div>
+            
+            <!-- Results Section -->
+            <div class="result-section" id="results">
+                <h3><i class="fas fa-chart-line"></i> Analysis Results</h3>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="risk-alert" id="riskAlert">
+                            <!-- Risk alert will be populated here -->
+                        </div>
+                        
+                        <div class="feature-card">
+                            <h5><i class="fas fa-exclamation-triangle"></i> Risk Factors</h5>
+                            <ul id="riskFactors">
+                                <!-- Risk factors will be populated here -->
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="risk-gauge">
+                            <canvas id="riskGauge"></canvas>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <h5><i class="fas fa-check-circle"></i> Transaction Validation</h5>
+                            <div id="validationResults">
+                                <!-- Validation results will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="feature-card">
+                            <h5><i class="fas fa-lightbulb"></i> Security Recommendations</h5>
+                            <div id="recommendations">
+                                <!-- Recommendations will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Form submission handler
+        document.getElementById('fraudForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            analyzeTransaction();
+        });
+        
+        let currentSampleIndex = {'legitimate': 0, 'suspicious': 0, 'mixed': 0};
+
+        // Load sample data with rotation
+        function loadSampleData(type) {
+            console.log('Loading sample data for type:', type);
+            fetch('/api/sample-data')
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Sample data received:', data);
+                    const samples = data[type];
+                    if (!samples || samples.length === 0) {
+                        console.error('No samples found for type:', type);
+                        return;
+                    }
+                    const sample = samples[currentSampleIndex[type]];
+                    console.log('Selected sample:', sample);
+
+                    document.getElementById('type').value = sample.type;
+                    document.getElementById('amount').value = sample.amount;
+                    document.getElementById('oldbalanceOrg').value = sample.oldbalanceOrg;
+                    document.getElementById('newbalanceOrg').value = sample.newbalanceOrg;
+                    document.getElementById('oldbalanceDest').value = sample.oldbalanceDest;
+                    document.getElementById('newbalanceDest').value = sample.newbalanceDest;
+                    document.getElementById('sender').value = sample.sender;
+                    document.getElementById('recipient').value = sample.recipient;
+
+                    // Rotate sample index
+                    currentSampleIndex[type] = (currentSampleIndex[type] + 1) % samples.length;
+                    console.log('Next index for', type, ':', currentSampleIndex[type]);
+                })
+                .catch(error => {
+                    console.error('Error loading sample data:', error);
+                    alert('Error loading sample data. Please try again.');
+                });
+        }
+        
+        // Analyze transaction
+        function analyzeTransaction() {
+            const formData = {
+                step: parseInt(document.getElementById('step').value),
+                type: document.getElementById('type').value,
+                amount: parseFloat(document.getElementById('amount').value),
+                oldbalanceOrg: parseFloat(document.getElementById('oldbalanceOrg').value),
+                newbalanceOrg: parseFloat(document.getElementById('newbalanceOrg').value),
+                oldbalanceDest: parseFloat(document.getElementById('oldbalanceDest').value),
+                newbalanceDest: parseFloat(document.getElementById('newbalanceDest').value),
+                sender: document.getElementById('sender').value,
+                recipient: document.getElementById('recipient').value
+            };
+            
+            console.log('Sending form data:', formData);
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            
+            // Make API call
+            fetch('/api/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Analysis result:', data);
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                displayResults(data);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('results').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                alert('Error analyzing transaction: ' + error.message);
+            });
+        }
+        
+        // Display results
+        function displayResults(data) {
+            // Risk alert
+            const riskAlert = document.getElementById('riskAlert');
+            riskAlert.className = `risk-alert risk-${data.risk_level.toLowerCase()}`;
+            riskAlert.innerHTML = `
+                <h4><i class="fas fa-${data.risk_level === 'HIGH' ? 'ban' : data.risk_level === 'MEDIUM' ? 'exclamation-triangle' : 'check-circle'}"></i> ${data.risk_level} RISK</h4>
+                <p><strong>Fraud Probability: ${data.fraud_probability.toFixed(1)}%</strong></p>
+                <p>${data.recommendation}</p>
+            `;
+            
+            // Risk factors
+            const riskFactors = document.getElementById('riskFactors');
+            if (data.risk_factors.length > 0) {
+                riskFactors.innerHTML = data.risk_factors.map(factor => `<li>${factor}</li>`).join('');
+            } else {
+                riskFactors.innerHTML = '<li>No significant risk factors detected</li>';
+            }
+            
+            // Validation results
+            const validationResults = document.getElementById('validationResults');
+            validationResults.innerHTML = `
+                <p><i class="fas fa-${data.validation.balance_consistent ? 'check' : 'times'}"></i> Balance Consistency: ${data.validation.balance_consistent ? 'Valid' : 'Invalid'}</p>
+                <p><i class="fas fa-${data.validation.amount_reasonable ? 'check' : 'times'}"></i> Amount Range: ${data.validation.amount_reasonable ? 'Reasonable' : 'Suspicious'}</p>
+                <p><i class="fas fa-${data.validation.different_participants ? 'check' : 'times'}"></i> Participants: ${data.validation.different_participants ? 'Different' : 'Same Person'}</p>
+            `;
+            
+            // Recommendations
+            const recommendations = document.getElementById('recommendations');
+            let recText = '';
+            if (data.fraud_probability > 50) {
+                recText = `
+                    <ul>
+                        <li>🔒 Block this transaction immediately</li>
+                        <li>📞 Contact customer for verification</li>
+                        <li>🔍 Conduct manual review</li>
+                        <li>📝 Document the incident</li>
+                    </ul>
+                `;
+            } else if (data.fraud_probability > 30) {
+                recText = `
+                    <ul>
+                        <li>🔐 Request additional authentication</li>
+                        <li>📱 Send OTP verification</li>
+                        <li>💳 Verify card details</li>
+                        <li>⏰ Monitor account activity</li>
+                    </ul>
+                `;
+            } else {
+                recText = `
+                    <ul>
+                        <li>✅ Transaction can proceed</li>
+                        <li>📊 Continue monitoring</li>
+                        <li>🔔 Log for future analysis</li>
+                        <li>📈 Update customer profile</li>
+                    </ul>
+                `;
+            }
+            recommendations.innerHTML = recText;
+            
+            // Create risk gauge
+            createRiskGauge(data.fraud_probability);
+        }
+        
+        // Create risk gauge chart
+        function createRiskGauge(probability) {
+            const ctx = document.getElementById('riskGauge').getContext('2d');
+            
+            // Clear previous chart
+            if (window.riskChart) {
+                window.riskChart.destroy();
+            }
+            
+            window.riskChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [probability, 100 - probability],
+                        backgroundColor: [
+                            probability > 70 ? '#e74c3c' : probability > 30 ? '#f39c12' : '#27ae60',
+                            '#ecf0f1'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: [{
+                    beforeDraw: function(chart) {
+                        const width = chart.width;
+                        const height = chart.height;
+                        const ctx = chart.ctx;
+                        
+                        ctx.restore();
+                        const fontSize = (height / 114).toFixed(2);
+                        ctx.font = fontSize + "em sans-serif";
+                        ctx.textBaseline = "middle";
+                        
+                        const text = probability.toFixed(1) + "%";
+                        const textX = Math.round((width - ctx.measureText(text).width) / 2);
+                        const textY = height / 2;
+                        
+                        ctx.fillText(text, textX, textY);
+                        ctx.save();
+                    }
+                }]
+            });
+        }
+    </script>
+</body>
+</html>
