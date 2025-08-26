@@ -19,16 +19,17 @@ A professional web interface for the fraud detection system built with Flask and
 python deploy_web.py
 ```
 
+
 ### Option 2: Manual Setup
 1. Install dependencies:
-   ```bash
-   pip install -r web_requirements.txt
-   ```
+  ```bash
+  pip install -r requirements.txt
+  ```
 
 2. Run the web application:
-   ```bash
-   python web_app.py
-   ```
+  ```bash
+  python web_app.py
+  ```
 
 3. Open your browser and go to: `http://localhost:5000`
 
@@ -96,16 +97,7 @@ python deploy_web.py
 - **Charts**: Chart.js
 - **ML Model**: Scikit-learn
 
-## 🆚 Streamlit vs Web App Comparison
 
-| Feature | Streamlit | Web App |
-|---------|-----------|---------|
-| **Setup** | Simple | Requires Flask setup |
-| **Customization** | Limited | Full control |
-| **Deployment** | Easy | More flexible |
-| **Performance** | Good | Better |
-| **Integration** | Limited | Full API support |
-| **UI Control** | Limited | Complete |
 
 ## 🤝 Contributing
 
